@@ -9,7 +9,7 @@ app = typer.Typer()
 
 
 @app.command()
-def set_times(days: Optional[int] = 300):
+def set_times(days: int = typer.Argument(300)):
     create_times_of_the_day(days)
 
 
