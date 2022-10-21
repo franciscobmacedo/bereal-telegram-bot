@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "berealbot"
+version = "0.1.0"
+description = ""
+authors = ["Francisco Macedo <franciscovcbm@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-telegram-bot = "^13.14"
+python-decouple = "^3.6"
+tinydb = "^4.7.0"
+typer = "^0.6.1"
+pydantic = "^1.10.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
