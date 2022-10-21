@@ -17,7 +17,7 @@ def create_times_of_the_day(days: int):
     today = datetime.date.today()
     for i in range(days):
         next_day = today + datetime.timedelta(days=i)
-        hour = random.randint(10, 22)
+        hour = random.randint(9, 22)
         minute = random.randint(0, 59)
         table.insert(
             {
