@@ -17,8 +17,8 @@ To setup locally:
 3. Install dependencies with `poetry install`;
 4. Launch a poetry shell so the dependencies are active: `poetry shell`;
 5. Run `python run.py set-times <NUMBER_OF_DAYS>` to fill the times table with the upcoming `<NUMBER_OF_DAYS>` random times (by default 300). Examples:
-   - `python run.py set-times` - reset's the db table set's the random times for the next 300 days;
-   - `python run.py set-times 400` - reset's the db table set's the random times for the next 400 days; 
+   - `python run.py set-times` - reset's the db table and set's the random times for the next 300 days;
+   - `python run.py set-times 400` - reset's the db table and set's the random times for the next 400 days; 
 6. Run `python run.py bot` to start the bot service;
 
 You can also edit `src/settings.py` with your own preferences where:

@@ -32,3 +32,7 @@ TIMES_TABLE_NAME = "times"
 CHATS_TABLE_NAME = "chats"
 
 db = TinyDB(DB_FILE)
+
+DAYS_TO_RUN = 300
+MIN_HOUR = 9
+MAX_HOUR = 22

@@ -10,14 +10,17 @@ from src import settings
 logger = logging.getLogger(__name__)
 
 
-def create_times_of_the_day(days: int):
-    logger.info(f"creating times for the next {days} days")
+def create_times_of_the_day(days: int, min_hour: int, max_hour: int):
+    logger.info(
+        f"creating random times for the next {days} days between {min_hour}h and {max_hour}h."
+    )
+
     table = settings.db.table(settings.TIMES_TABLE_NAME)
     table.truncate()
     today = datetime.date.today()
     for i in range(days):
         next_day = today + datetime.timedelta(days=i)
-        hour = random.randint(9, 22)
+        hour = random.randint(min_hour, max_hour)
         minute = random.randint(0, 59)
         table.insert(
             {
