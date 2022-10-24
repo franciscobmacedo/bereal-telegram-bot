@@ -16,13 +16,13 @@ To setup locally:
 2. create an `.env` file, with environment variables, like it's in `.env.example` - add your bot's `TELEGRAM_BOT_USERNAME` and `TELEGRAM_TOKEN`;
 3. Install dependencies with `poetry install`;
 4. Launch a poetry shell so the dependencies are active: `poetry shell`;
-5. Run `python run.py set-times <NUMBER_OF_DAYS>` to fill the times table with the upcoming `<NUMBER_OF_DAYS>` random times (by default 300). Examples:
-   - `python run.py set-times` - reset's the db table and set's the random times for the next 300 days;
-   - `python run.py set-times 400` - reset's the db table and set's the random times for the next 400 days; 
+5. Run `python run.py set-times <NUMBER_OF_DAYS> <MIN_HOUR> <MAX_HOUR>` to fill the times table with random times where:
+   - `NUMBER_OF_DAYS` - **optional** - is the number of days that the bot will run for, starting today (default: 300);
+   - `MIN_HOUR` - **optional** - is the earliest hour to send the message (default: 9);
+   -  `MAX_HOUR` - **optional** - is the latest hour to send the message (default: 22);
 6. Run `python run.py bot` to start the bot service;
 
 You can also edit `src/settings.py` with your own preferences where:
-
 1. `DEBUG`: variable to set if the command is always sent (if `True`) or only when the now time corresponds to the defined random time;
 2. `SECONDS_BETWEEN_CALLBACK`: interval for the bot to check if the current time matches the random defined time - ignored in debug mode;
 3. `WELCOME_MESSAGE`: message to send to the telegram chat when the bot joins the chat;
