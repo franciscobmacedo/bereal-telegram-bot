@@ -9,32 +9,42 @@
   <body>
     <div class="mx-auto container pt-4 sm:pt-8">
         <p class="text-3xl">Total chats: <span id="total"></span></p>
+        <ul id="chats"></ul>
         <canvas class="p-10" id="chartLine"></canvas>
     </div>
     <script>
       fetch("/chats")
         .then((response) => response.json())
-        .then((chats) => renderChatsChart(chats));
-      const renderChatsChart = (chats) => {
-        document.getElementById('total').innerHTML = chats.values.reduce((partialSum, a) => partialSum + a, 0);
-        console.log("rendering chats", chats);
+        .then((response) => renderChatsChart(response));
+      const renderChatsChart = (chatsData) => {
+        
+        console.log("rendering chats", chatsData);
+        document.getElementById('total').innerHTML = chatsData.values.reduce((partialSum, a) => partialSum + a, 0);
 
-        const labels = chats.labels;
-        const data = {
+        const ul = document.getElementById('chats');
+        const listElements = chatsData.chats.map(chat=>{
+            const li =  document.createElement('li');
+            li.innerHTML = chat.title ? `${chat.title}: ${chat.id}` : chat.id;
+            ul.appendChild(li);
+        })
+
+
+        const labels = chatsData.labels;
+        const chartData = {
           labels: labels,
           datasets: [
             {
               label: "Chats per day",
               backgroundColor: "hsl(252, 82.9%, 67.8%)",
               borderColor: "hsl(252, 82.9%, 67.8%)",
-              data: chats.values,
+              data: chatsData.values,
             },
           ],
         };
 
         const configLineChart = {
           type: "line",
-          data,
+          data:chartData,
           options: {},
         };
 
