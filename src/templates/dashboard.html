@@ -6,28 +6,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
+  <style>
+    .success{
+        color: rgb(94, 182, 53) ;
+    }
+
+    .error{
+        color: rgb(222, 72, 55) ;
+    }
+  </style>
   <body>
     <div class="mx-auto container pt-4 sm:pt-8">
-        <p class="text-3xl">Total chats: <span id="total"></span></p>
-        <ul id="chats"></ul>
-        <canvas class="p-10" id="chartLine"></canvas>
+      <p class="text-3xl">Total chats: <span id="total"></span></p>
+      <ul id="chats"></ul>
+      <canvas class="p-10" id="chartLine"></canvas>
     </div>
     <script>
       fetch("/chats")
         .then((response) => response.json())
         .then((response) => renderChatsChart(response));
       const renderChatsChart = (chatsData) => {
-        
         console.log("rendering chats", chatsData);
-        document.getElementById('total').innerHTML = chatsData.values.reduce((partialSum, a) => partialSum + a, 0);
+        document.getElementById("total").innerHTML = chatsData.chats.length;
 
-        const ul = document.getElementById('chats');
-        const listElements = chatsData.chats.map(chat=>{
-            const li =  document.createElement('li');
-            li.innerHTML = chat.title ? `${chat.title}: ${chat.id}` : chat.id;
-            ul.appendChild(li);
-        })
+        const ul = document.getElementById("chats");
+        const listElements = chatsData.chats.map((chat) => {
+          const li = document.createElement("li");
+          li.innerHTML = `${chat.title}: ${chat.id}`;
+          const span = document.createElement("span");
 
+          if (chat.active) {
+            span.classList.add("success");
+            span.innerHTML = " active";
+          } else {
+            span.classList.add("error");
+            span.innerHTML = " not-active";
+          }
+          li.appendChild(span);
+          ul.appendChild(li);
+        });
 
         const labels = chatsData.labels;
         const chartData = {
@@ -44,7 +61,7 @@
 
         const configLineChart = {
           type: "line",
-          data:chartData,
+          data: chartData,
           options: {},
         };
 
