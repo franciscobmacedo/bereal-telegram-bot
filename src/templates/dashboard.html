@@ -7,21 +7,60 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <style>
-    .success{
-        color: rgb(94, 182, 53) ;
+    .success {
+      color: rgb(94, 182, 53);
     }
 
-    .error{
-        color: rgb(222, 72, 55) ;
+    .error {
+      color: rgb(222, 72, 55);
     }
   </style>
   <body>
     <div class="mx-auto container pt-4 sm:pt-8">
       <p class="text-3xl">Total chats: <span id="total"></span></p>
-      <ul id="chats"></ul>
+      <div class="overflow-hidden">
+        <table class="min-w-full" id="chats">
+          <thead class="border-b">
+            <tr>
+              <th
+                scope="col"
+                class="text-sm font-medium text-gray-900 px-6 py-4 text-center"
+              >
+                Title
+              </th>
+              <th
+                scope="col"
+                class="text-sm font-medium text-gray-900 px-6 py-4 text-center"
+              >
+                ID
+              </th>
+              <th
+                scope="col"
+                class="text-sm font-medium text-gray-900 px-6 py-4 text-center"
+              >
+                Active
+              </th>
+              <th
+                scope="col"
+                class="text-sm font-medium text-gray-900 px-6 py-4 text-center"
+              >
+                created_at
+              </th>
+              <th
+                scope="col"
+                class="text-sm font-medium text-gray-900 px-6 py-4 text-center"
+              >
+                updated_at
+              </th>
+            </tr>
+          </thead>
+          <tbody class="text-center"></tbody>
+        </table>
+      </div>
       <canvas class="p-10" id="chartLine"></canvas>
     </div>
     <script>
+      const tableFields = ["title", "id", "active", "created_at", "updated_at"];
       fetch("/chats")
         .then((response) => response.json())
         .then((response) => renderChatsChart(response));
@@ -29,21 +68,27 @@
         console.log("rendering chats", chatsData);
         document.getElementById("total").innerHTML = chatsData.chats.length;
 
-        const ul = document.getElementById("chats");
-        const listElements = chatsData.chats.map((chat) => {
-          const li = document.createElement("li");
-          li.innerHTML = `${chat.title}: ${chat.id}`;
-          const span = document.createElement("span");
+        const tableBody = document.getElementById("chats").tBodies[0];
+        console.log(tableBody);
 
-          if (chat.active) {
-            span.classList.add("success");
-            span.innerHTML = " active";
-          } else {
-            span.classList.add("error");
-            span.innerHTML = " not-active";
-          }
-          li.appendChild(span);
-          ul.appendChild(li);
+        chatsData.chats.forEach((chat) => {
+          const row = document.createElement("tr");
+          tableFields.forEach((field) => {
+            const cell = document.createElement("td");
+            if (field == "active") {
+              if (chat.active) {
+                cell.classList.add("success");
+                cell.innerHTML = "active";
+              } else {
+                cell.classList.add("error");
+                cell.innerHTML = "not-active";
+              }
+            } else {
+              cell.innerHTML = chat[field];
+            }
+            row.append(cell);
+          });
+          tableBody.appendChild(row);
         });
 
         const labels = chatsData.labels;
