@@ -3,11 +3,17 @@ import logging
 import random
 from typing import Optional
 
-from tinydb import Query, operations
+from pydantic import parse_obj_as
+from tinydb import Query
 
 from src import settings
+from src.schemas import Chat
 
 logger = logging.getLogger(__name__)
+
+
+def now():
+    return datetime.datetime.now().isoformat()
 
 
 def create_times_of_the_day(days: int, min_hour: int, max_hour: int):
@@ -40,32 +46,49 @@ def get_time_of_the_day() -> Optional[datetime.time]:
         return datetime.time.fromisoformat(times[0]["time"])
 
 
-def add_chat_id(chat_id: int, active: bool = True) -> None:
+def add_chat(chat: Chat, active: bool = True) -> None:
     query = Query()
     table = settings.db.table(settings.CHATS_TABLE_NAME)
-    chat = table.search(query.chat_id == chat_id)
-    if chat:
+    if table.search(query.id == chat.id):
         logger.info(
-            f"chat_id {chat_id} is already in the database - updating active status to {active}"
+            f"chat_id {chat.id} is already in the database - updating active status to {active}"
         )
-        table.update(operations.set("active", active), query.chat_id == chat_id)
+        update_chat(chat=chat, active=active)
         return
-    logger.info(f"Adding chat_id {chat_id}")
-    table.insert({"chat_id": chat_id, "active": active})
+    logger.info(f"Adding chat_id {chat.id}")
+    chat.updated_at = now()
+    chat.created_at = now()
+    chat.active = active
+    table.insert(chat.dict())
     logger.info(f"Done!")
 
 
-def disable_chat_id(chat_id: int) -> None:
+def update_chat(
+    chat: Chat | None = None, chat_id: int | None = None, active: bool = True
+) -> None:
     query = Query()
     table = settings.db.table(settings.CHATS_TABLE_NAME)
-    logger.info(f"Disabling chat_id {chat_id}")
-    table.update(operations.set("active", False), query.chat_id == chat_id)
+    if chat_id:
+        chat_obj = table.search(query.id == chat_id)[0]
+        chat = Chat.parse_obj(chat_obj)
+    elif not chat:
+        raise Exception("chat_id or chat object are needed to update db")
+    logger.info(f"updating chat_id {chat.id}")
+    table.update({"active": active, "updated_at": now()}, query.id == chat.id)
     logger.info(f"Done!")
+
+
+def get_chats(only_active: bool = True) -> list[Chat]:
+    logger.info(f"Getting {'active' if only_active else 'all'} chats")
+    table = settings.db.table(settings.CHATS_TABLE_NAME)
+    chats_arr = table.all()
+    chats = parse_obj_as(list[Chat], chats_arr)
+    logger.info(f"Found {len(chats)} chats in total")
+    if only_active:
+        return [chat for chat in chats if chat.active == True]
+    return chats
 
 
 def get_chat_ids(only_active: bool = True) -> list[int]:
-    logger.info(f"Getting {'active' if only_active else 'all'} chats")
-    table = settings.db.table(settings.CHATS_TABLE_NAME)
-    chats = table.all()
-    logger.info(f"Found {len(chats)} chats")
-    return [chat["chat_id"] for chat in chats]
+    chats = get_chats(only_active)
+    return [chat.id for chat in chats]

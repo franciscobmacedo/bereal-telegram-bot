@@ -33,4 +33,4 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /code
 COPY . /code/
 
-CMD ["./run.py", "bot"]
+EXPOSE 8040

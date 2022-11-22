@@ -1,7 +1,6 @@
 import datetime
 import logging
 
-from pydantic import BaseModel
 from telegram import Update, error
 from telegram.ext import (
     CallbackContext,
@@ -14,27 +13,24 @@ from telegram.ext import (
 
 import src.db as db
 from src import settings
-
-
-class Context(BaseModel):
-    chat_id: int
-
+from src.schemas import Chat, Context
 
 logger = logging.getLogger(__name__)
 
 
-def add_job_to_queue(job_queue: JobQueue, chat_id: int):
-    db.add_chat_id(chat_id)
+def add_job_to_queue(job_queue: JobQueue, chat: Chat):
+    db.add_chat(chat=chat, active=True)
     job_queue.run_repeating(
         callback,
         10 if settings.DEBUG else settings.SECONDS_BETWEEN_CALLBACK,
-        name=str(chat_id),
-        context=Context(chat_id=chat_id),
+        name=str(chat.id),
+        context=Context(chat_id=chat.id),
     )
 
 
 def remove_job_from_queue(job: Job, chat_id: int):
-    db.disable_chat_id(chat_id)
+    print("removing job for chat id", chat_id)
+    db.update_chat(chat_id=chat_id, active=False)
     job.remove()
 
 
@@ -65,15 +61,17 @@ def new_member(update: Update, context: CallbackContext) -> None:
     ]
     bot_added_to_chat = len(members) > 0
     if bot_added_to_chat:
-        add_job_to_queue(context.job_queue, update.message.chat_id)
+        print(update.message)
+        chat = Chat.from_message(message=update.message, active=True)
+        add_job_to_queue(context.job_queue, chat)
         update.message.reply_text(settings.WELCOME_MESSAGE)
 
 
 def run():
     logger.info(f"starting telegram bot")
     updater = Updater(token=settings.TELEGRAM_TOKEN, use_context=True)
-    for chat_id in db.get_chat_ids():
-        add_job_to_queue(updater.job_queue, chat_id)
+    for chat in db.get_chats(only_active=True):
+        add_job_to_queue(updater.job_queue, chat)
     dispatcher = updater.dispatcher
     new_member_handler = MessageHandler(
         Filters.status_update.new_chat_members, new_member

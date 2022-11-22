@@ -4,6 +4,9 @@ services:
   bot:
     container_name: berealbot
     build: .
-    command: python run.py bot
+    command: python run.py both
     volumes:
       - .:/code
+    ports:
+      - 8040:8040
+    
