@@ -7,6 +7,7 @@ A reminder bot to share a picture with your chat everyday at a random time. Heav
 
 
 [comment]: This is currently running live so you can just add `@BeRealEverydayBot` to your chat and it will remind you to share a picture at a random time everyday.
+
 :warning: This is currently not running live.
 
 
